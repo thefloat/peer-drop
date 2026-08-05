@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane styleClass="root-pane" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.peerdrop.desktop.view.controller.GatewayController">
+
+    <VBox alignment="CENTER" maxWidth="420.0" minWidth="-Infinity" prefWidth="350.0" spacing="24" styleClass="welcome-card">
+
+        <padding>
+            <Insets bottom="32" left="32" right="32" top="32" />
+        </padding>
+
+        <Label styleClass="welcome-title" text="PeerDrop" />
+
+        <VBox maxWidth="1.7976931348623157E308" spacing="8">
+            <Label styleClass="section-label" text="SESSION_HANDLE" />
+            <TextField fx:id="usernameField" promptText="Enter a handle..." styleClass="welcome-text-field" />
+        </VBox>
+
+        <Button fx:id="joinButton" defaultButton="true" maxWidth="1.7976931348623157E308" onAction="#handleLogin" styleClass="btn-connect" text="Connect" />
+
+        <Label fx:id="statusLabel" styleClass="welcome-status" text="Ready" />
+
+    </VBox>
+
+</StackPane>

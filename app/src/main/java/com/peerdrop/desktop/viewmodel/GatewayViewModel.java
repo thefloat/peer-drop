@@ -1,0 +1,88 @@
+package com.peerdrop.desktop.viewmodel;
+
+import com.peerdrop.desktop.model.PeerSession;
+import com.peerdrop.desktop.service.DiscoveryService;
+import com.peerdrop.desktop.service.FileShareService;
+import com.peerdrop.desktop.service.MessageService;
+import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.view.ViewManager;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+public class GatewayViewModel {
+    private final StringProperty username = new SimpleStringProperty("");
+    private final StringProperty statusLabel = new SimpleStringProperty("");
+    private final BooleanProperty isConnecting = new SimpleBooleanProperty(false);
+
+    private final ViewManager viewManager;
+    private final MessageService messageService;
+    private final FileShareService fileShareService;
+    private final DiscoveryService discoveryService;
+
+    public GatewayViewModel(
+            ViewManager viewManager, MessageService messageService,
+            DiscoveryService discoveryService, FileShareService fileShareService
+    ) {
+        this.viewManager = viewManager;
+        this.messageService = messageService;
+        this.fileShareService = fileShareService;
+        this.discoveryService = discoveryService;
+    }
+
+    private void setPeerSession(String username) {
+        SessionContext.INSTANCE.setPeerSession(
+                new PeerSession(username)
+        );
+    }
+
+    /*
+     - One word.
+     - >= 2 characters.
+    */
+    private boolean isValidUsername(String username) {
+        if (username.length() < 2) {
+            statusLabel.set("username should have length >= 2");
+            return false;
+        }
+
+        return true;
+    }
+
+    public void join() {
+        String trimmed = username.get().trim();
+
+        if (trimmed.isEmpty()) {
+            statusLabel.set("Error: Username cannot be empty.");
+            return;
+        }
+
+        isConnecting.set(true);
+        statusLabel.set("Connecting...");
+
+        if (!isValidUsername(trimmed)) {
+            return;
+        }
+
+        setPeerSession(trimmed);
+
+        messageService.start();
+        fileShareService.start();
+        discoveryService.start();
+        viewManager.showCentralHubView();
+    }
+
+    // getters
+    public StringProperty usernameProperty() {
+        return username;
+    }
+
+    public StringProperty statusMessageProperty() {
+        return statusLabel;
+    }
+
+    public BooleanProperty isConnectingProperty() {
+        return isConnecting;
+    }
+}
