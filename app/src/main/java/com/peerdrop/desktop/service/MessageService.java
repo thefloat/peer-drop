@@ -3,7 +3,7 @@ package com.peerdrop.desktop.service;
 import com.peerdrop.desktop.model.Message;
 import com.peerdrop.desktop.model.Peer;
 import com.peerdrop.desktop.protocol.JsonCodec;
-import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.state.AppContext;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,9 +27,13 @@ public class MessageService {
     private final CopyOnWriteArrayList<Consumer<Message>> listeners =
             new CopyOnWriteArrayList<>();
     private final AtomicInteger threadNumber = new AtomicInteger(1);
+    private final AppContext appContext;
+
     private volatile boolean isRunning = false;
 
-    private MessageService() throws IOException {
+    private MessageService(AppContext appContext) throws IOException {
+        this.appContext = appContext;
+
         serverSocket = new ServerSocket(0);
         peerConnPool = Executors.newCachedThreadPool(r -> {
             var t = new Thread(r);
@@ -39,9 +43,9 @@ public class MessageService {
         });
     }
 
-    public static MessageService create() {
+    public static MessageService create(AppContext appContext) {
         try {
-            return new MessageService();
+            return new MessageService(appContext);
         } catch (IOException e) {
             System.err.println("[Msg Service] I/O error while opening tcp socket.");
         }
@@ -89,7 +93,7 @@ public class MessageService {
 
     private void acceptLoop() {
         try {
-            SessionContext.INSTANCE.setMessagePort(serverSocket.getLocalPort());
+            appContext.setMessagePort(serverSocket.getLocalPort());
 
             while (isRunning) {
                 try {

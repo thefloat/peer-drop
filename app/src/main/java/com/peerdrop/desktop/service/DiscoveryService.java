@@ -5,8 +5,8 @@ import com.peerdrop.desktop.model.Peer;
 import com.peerdrop.desktop.model.PeerSession;
 import com.peerdrop.desktop.service.util.NetworkInterfaceUtils;
 import com.peerdrop.desktop.protocol.JsonCodec;
+import com.peerdrop.desktop.state.AppContext;
 import com.peerdrop.desktop.state.PeerRegistry;
-import com.peerdrop.desktop.state.SessionContext;
 
 import java.io.IOException;
 import java.net.*;
@@ -17,24 +17,28 @@ import java.util.function.Consumer;
 public class DiscoveryService {
     private static final String GROUP = "230.0.0.1";
     private static final int DISCOVERY_PORT = 8888;
+
     private final CopyOnWriteArrayList<Consumer<List<Peer>>> listeners =
             new CopyOnWriteArrayList<>();
-
     private final MulticastSocket multicastSocket;
     private final PeerRegistry peerRegistry;
+    private final AppContext appContext;
+
     private volatile boolean isRunning = false;
 
-    private DiscoveryService() throws IOException {
+    private DiscoveryService(AppContext appContext) throws IOException {
+        this.appContext = appContext;
+
         peerRegistry = new PeerRegistry();
-        this.multicastSocket = new MulticastSocket(DISCOVERY_PORT);
+        multicastSocket = new MulticastSocket(DISCOVERY_PORT);
 
         multicastSocket.setNetworkInterface(selectNetworkInterface());
         // multicastSocket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false); // Disable loop back
     }
 
-    public static DiscoveryService create() {
+    public static DiscoveryService create(AppContext appContext) {
         try {
-            return new DiscoveryService();
+            return new DiscoveryService(appContext);
         } catch (IOException e) {
             System.err.println("[Dsc Service] I/O error while initializing multicast sockets.");
 
@@ -59,7 +63,7 @@ public class DiscoveryService {
     }
 
     private PeerSession getPeerSession() {
-        return SessionContext.INSTANCE.getPeerSession().orElseThrow();
+        return appContext.getPeerSession();
     }
 
     private void notifyListeners() {
@@ -144,8 +148,8 @@ public class DiscoveryService {
 
                 var payload = JsonCodec.encode(
                         new ServicePorts(
-                                SessionContext.INSTANCE.getMessagePort().orElseThrow(),
-                                SessionContext.INSTANCE.getFileSharePort().orElseThrow()
+                                appContext.getMessagePort(),
+                                appContext.getFileSharePort()
                         )
                 );
                 Message message =

@@ -4,7 +4,7 @@ import com.peerdrop.desktop.model.PeerSession;
 import com.peerdrop.desktop.service.DiscoveryService;
 import com.peerdrop.desktop.service.FileShareService;
 import com.peerdrop.desktop.service.MessageService;
-import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.state.AppContext;
 import com.peerdrop.desktop.view.ViewManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,24 +17,24 @@ public class GatewayViewModel {
     private final BooleanProperty isConnecting = new SimpleBooleanProperty(false);
 
     private final ViewManager viewManager;
+    private final AppContext appContext;
     private final MessageService messageService;
     private final FileShareService fileShareService;
     private final DiscoveryService discoveryService;
 
     public GatewayViewModel(
-            ViewManager viewManager, MessageService messageService,
-            DiscoveryService discoveryService, FileShareService fileShareService
+            ViewManager viewManager,
+            AppContext appContext
     ) {
         this.viewManager = viewManager;
-        this.messageService = messageService;
-        this.fileShareService = fileShareService;
-        this.discoveryService = discoveryService;
+        this.appContext = appContext;
+        this.messageService = appContext.getMessageService();
+        this.fileShareService = appContext.getFileShareService();
+        this.discoveryService = appContext.getDiscoveryService();
     }
 
     private void setPeerSession(String username) {
-        SessionContext.INSTANCE.setPeerSession(
-                new PeerSession(username)
-        );
+        appContext.setPeerSession(new PeerSession(username));
     }
 
     /*
@@ -70,6 +70,7 @@ public class GatewayViewModel {
         messageService.start();
         fileShareService.start();
         discoveryService.start();
+
         viewManager.showCentralHubView();
     }
 

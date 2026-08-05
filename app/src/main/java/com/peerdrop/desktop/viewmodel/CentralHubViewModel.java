@@ -7,7 +7,7 @@ import com.peerdrop.desktop.service.DiscoveryService;
 import com.peerdrop.desktop.service.FileShareService;
 import com.peerdrop.desktop.service.MessageService;
 import com.peerdrop.desktop.protocol.JsonCodec;
-import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.state.AppContext;
 import com.peerdrop.desktop.view.ViewManager;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -60,10 +60,11 @@ public class CentralHubViewModel {
     // Dependencies
     // -------------------------------------------------------------------------
 
-    private final ViewManager       viewManager;
-    private final MessageService    messageService;
-    private final DiscoveryService  discoveryService;
-    private final FileShareService  fileShareService;
+    private final ViewManager viewManager;
+    private final AppContext appContext;
+    private final MessageService messageService;
+    private final DiscoveryService discoveryService;
+    private final FileShareService fileShareService;
     private final PeerSession peerSession;
 
     // -------------------------------------------------------------------------
@@ -71,17 +72,16 @@ public class CentralHubViewModel {
     // -------------------------------------------------------------------------
 
     public CentralHubViewModel(
-            ViewManager      viewManager,
-            MessageService   messageService,
-            DiscoveryService discoveryService,
-            FileShareService fileShareService
+            ViewManager viewManager,
+            AppContext appContext
     ) {
-        this.viewManager      = viewManager;
-        this.messageService   = messageService;
-        this.discoveryService = discoveryService;
-        this.fileShareService = fileShareService;
-        
-        this.peerSession = resolvePeerSession();
+        this.viewManager = viewManager;
+        this.appContext = appContext;
+        this.messageService = appContext.getMessageService();
+        this.fileShareService = appContext.getFileShareService();
+        this.discoveryService = appContext.getDiscoveryService();
+
+        this.peerSession = appContext.getPeerSession();
         sessionHandle.set("@" + peerSession.username());
 
         setupListeners();
@@ -103,10 +103,6 @@ public class CentralHubViewModel {
                 onHostedFilesUpdated();
             }
         });
-    }
-
-    private PeerSession resolvePeerSession() {
-        return SessionContext.INSTANCE.getPeerSession().orElseThrow();
     }
 
     // -------------------------------------------------------------------------
@@ -209,6 +205,7 @@ public class CentralHubViewModel {
      * Closes all services and navigates back to the welcome view.
      */
     public void leave() {
+        appContext.reset();
         viewManager.reset();
         viewManager.showGatewayView();
     }

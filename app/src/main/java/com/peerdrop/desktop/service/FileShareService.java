@@ -1,6 +1,6 @@
 package com.peerdrop.desktop.service;
 
-import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.state.AppContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -29,9 +29,10 @@ public class FileShareService {
     private final ConcurrentHashMap<String, File> hostedFiles = new ConcurrentHashMap<>();
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
     private volatile boolean isRunning = false;
 
-    private FileShareService() throws IOException {
+    private FileShareService(AppContext appContext) throws IOException {
         this.httpServer = HttpServer.create(new InetSocketAddress(0), 0);
         this.httpServer.createContext("/download", new FileSharingHandler());
         this.httpServer.setExecutor(Executors.newCachedThreadPool(r -> {
@@ -41,13 +42,12 @@ public class FileShareService {
             return t;
         }));
 
-        // Update session singleton
-        SessionContext.INSTANCE.setFileSharePort(httpServer.getAddress().getPort());
+        appContext.setFileSharePort(httpServer.getAddress().getPort());
     }
 
-    public static FileShareService create() {
+    public static FileShareService create(AppContext appContext) {
         try {
-            return new FileShareService();
+            return new FileShareService(appContext);
         } catch (IOException e) {
             System.err.println("[FileShare Service] I/O error while opening tcp socket.");
         }

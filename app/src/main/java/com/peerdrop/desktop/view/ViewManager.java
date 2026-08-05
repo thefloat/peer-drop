@@ -1,9 +1,6 @@
 package com.peerdrop.desktop.view;
 
-import com.peerdrop.desktop.service.DiscoveryService;
-import com.peerdrop.desktop.service.FileShareService;
-import com.peerdrop.desktop.service.MessageService;
-import com.peerdrop.desktop.state.SessionContext;
+import com.peerdrop.desktop.state.AppContext;
 import com.peerdrop.desktop.view.controller.CentralHubController;
 import com.peerdrop.desktop.view.controller.GatewayController;
 import com.peerdrop.desktop.viewmodel.CentralHubViewModel;
@@ -19,19 +16,16 @@ import java.io.IOException;
 public class ViewManager {
     private final Stage stage;
 
-    private MessageService messageService;
-    private FileShareService fileShareService;
-    private DiscoveryService discoveryService;
+    private final AppContext appContext;
 
     private GatewayViewModel gatewayViewModel;
     private CentralHubViewModel centralHubViewModel;
 
     public ViewManager(
-            Stage stage
+            Stage stage, AppContext appContext
     ) {
         this.stage = stage;
-
-        reset();
+        this.appContext = appContext;
     }
 
     public void showGatewayView() {
@@ -51,16 +45,6 @@ public class ViewManager {
     public void reset() {
         gatewayViewModel = null;
         centralHubViewModel = null;
-
-        if (messageService != null) messageService.close();
-        if (fileShareService != null) fileShareService.close();
-        if (discoveryService != null) discoveryService.close();
-
-        SessionContext.INSTANCE.clear();
-
-        messageService = MessageService.create();
-        fileShareService = FileShareService.create();
-        discoveryService = DiscoveryService.create();
     }
 
     private void loadView (
@@ -86,7 +70,7 @@ public class ViewManager {
     private GatewayViewModel getWelcomeViewModel() {
         if (gatewayViewModel == null) {
             gatewayViewModel =
-                    new GatewayViewModel(this, messageService, discoveryService, fileShareService);
+                    new GatewayViewModel(this, appContext);
         }
         return gatewayViewModel;
     }
@@ -95,7 +79,7 @@ public class ViewManager {
         if (centralHubViewModel == null) {
             centralHubViewModel =
                     new CentralHubViewModel(
-                            this, messageService, discoveryService, fileShareService);
+                            this, appContext);
         }
         return centralHubViewModel;
     }
