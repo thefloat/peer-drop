@@ -1,10 +1,10 @@
 ---
 
-# LAN P2P Messenger & File Share
+# PeerDrop
 
-A cross-platform desktop application that enables instant peer-to-peer (P2P) messaging and file sharing across a Local Area Network (LAN) with zero configuration required.
+A cross-platform desktop application that enables instant peer-to-peer (P2P) messaging and file sharing across a Local Area Network (LAN).
 
-**Note on Project Purpose:** While local P2P applications are a well-explored domain, this project was deliberately built from scratch to demonstrate a fundamental, hands-on understanding of network programming (TCP/UDP), application architecture (MVVM), and concurrency. It showcases the ability to manage state, design application protocols, and bridge low-level network sockets with a modern graphical interface.
+**Note on Project Purpose:** While local P2P applications are a well-explored domain, this project was deliberately built from scratch to demonstrate a fundamental, hands-on implementation of network programming (TCP/UDP), application design pattern (MVVM), resource management and concurrency. It showcases the ability to manage state, design application protocols, and bridge low-level network sockets with a modern graphical interface.
 
 ---
 
@@ -18,13 +18,31 @@ This application allows users connected to the same Wi-Fi or wired network to au
 * **UI Framework:** JavaFX
 * **Architecture:** MVVM (Model-View-ViewModel)
 * **Networking:** Standard Java Networking (Sockets, Datagrams, internal HTTP server)
-* **Packaging:** `jpackage` (Native binaries for Windows and Linux)
+* **Packaging:** `jpackage` (Native binaries for Windows)
 
 ---
 
+
 ## 📸 Preview
 
-*[Insert a GIF or side-by-side screenshot here showing two clients discovering each other and sending a message/file]*
+### Connection Screen
+*Join a session by entering your handle.*
+
+![Screenshot of the connection screen, featuring a text input field for the session handle and a 'Connect' button](/assets/images/Gateway.PNG)
+
+<br>
+
+### Main Chat Interface
+*The core communication hub, featuring real-time messaging.*
+
+![Screenshot of the main interface, displaying a central chat area with message history, a text input field, and buttons for sending or attaching files. A side panel shows the active peer list, alongside 'Leave' and 'Settings' buttons](/assets/images/CentralHub-peer-a1.PNG)
+
+<br>
+
+### Settings Page
+*Change network configurations.*
+
+![Screenshot of the settings page, illustrating various network configuration options](/assets/images/Settings1(Redacted).png)
 
 ---
 
@@ -40,26 +58,26 @@ To make the system reliable and efficient, the application uses three different 
 
 ## ⚙️ Architecture & Technical Decisions
 
-### UI Architecture: MVVM
+### Design Pattern: MVVM
 
 The application strictly follows the **Model-View-ViewModel (MVVM)** design pattern to decouple the visual interface, application layer and service layer.
 
 * **View (JavaFX):** Handles only user inputs and rendering.
 * **ViewModel:** Bridges the UI and the core logic, using Java/javafx properties and observables to store current application state and reactively update the UI.
-* **Model:** Data, application layer and service layers.
+* **Model:** application layer and service layers, Data.
 
 ### Networking Implementation Details
 
-* **Discovery (UDP Multicast):** Clients listen on a specific multicast group. When a client boots, it broadcasts a heartbeat payload containing its username and listening ports.
+* **Discovery (UDP Multicast):** Peers listen on a specific multicast group. When a peer boots, it broadcasts a heartbeat payload containing its username and listening ports.
 * **Messaging (Ephemeral TCP & Framing):**
-* Connections are *ephemeral*—a new TCP socket is opened for each message and immediately closed.
+* Connections are *ephemeral*--a new TCP socket is opened for each message and immediately closed.
 * **Framing Protocol:** The app uses length-prefixed framing for messaging.--Every connection begins with a fixed-length header that specifies the exact byte array length of the incoming message. The receiver reads this header, allocates the exact buffer size needed, and reads the payload.
 
 
 * **File Sharing (HTTP Transfer):**
 * Files are not pushed; they are pulled.
-* **The Flow:** `Sender hosts file` → `Sender sends a 'file offer' TCP message with a Token and file metadata` → `Recipient accepts and issues an HTTP GET request` → `File downloads` → `Sender revokes the HTTP endpoint`.
-* **Memory Management:** Files aren't loaded into memory (large files would cause OutOfMemory error). Both sending and receiving sides utilize a buffer bucket then write directly to disk. 
+* **The Flow:** `Sender hosts file` → `Sender sends a 'file offer' TCP message with a token and file metadata` → `Recipient accepts and issues an HTTP GET request` → `File downloads` → `Sender revokes the HTTP endpoint`.
+* **Memory Management:** Files aren't loaded into memory (large files would cause OutOfMemory error). Both sending and receiving sides utilize a buffer bucket. Recipient writes directly to disk. 
 
 
 
@@ -80,15 +98,15 @@ No system is perfect. Here are the deliberate trade-offs made during development
 ### Option 1: Run the Pre-Packaged Release (Easiest)
 
 You do not need Java installed to run the pre-packaged versions.
+** Note: There's only releases for windows at this time, Linux and macOS users please [build from source] (#option-2-build-from-source).
 
-1. Navigate to the [Releases](https://www.google.com/search?q=%23) tab on this repository.
+1. Navigate to the [Releases](https://github.com/thefloat/peer-drop/releases/latest) tab on this repository.
 2. **Windows:** Download the `.msi` or `.exe` installer.
-3. **Linux:** Download the `.deb` or `.rpm` package.
-4. Install and run. (Ensure your firewall allows the application to communicate on private networks).
+3. Install and run. (Ensure your firewall allows the application to communicate on private networks).
 
 ### Option 2: Build from Source
 
-If you want to review the code and run it locally:
+If you want to review the code and run it locally or are on Linux or macOS:
 
 **Prerequisites:**
 
@@ -97,10 +115,10 @@ If you want to review the code and run it locally:
 
 ```shell
 # 1. Clone the repository
-git clone https://github.com/yourusername/lan-p2p-messenger.git
+git clone https://github.com/thefloat/peer-drop.git
 
 # 2. Navigate into the directory
-cd lan-p2p-messenger
+cd peer-drop
 
 ```
 
