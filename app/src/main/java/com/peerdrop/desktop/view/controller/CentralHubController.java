@@ -5,6 +5,7 @@ import com.peerdrop.desktop.model.Peer;
 import com.peerdrop.desktop.service.FileShareService;
 import com.peerdrop.desktop.protocol.JsonCodec;
 import com.peerdrop.desktop.viewmodel.CentralHubViewModel;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
@@ -21,7 +22,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,6 +277,11 @@ public class CentralHubController {
     @FXML
     public void handleSendMessage() {
         viewModel.sendMessage();
+    }
+
+    @FXML
+    public void handleSettings() {
+        viewModel.openSettings();
     }
 
     @FXML

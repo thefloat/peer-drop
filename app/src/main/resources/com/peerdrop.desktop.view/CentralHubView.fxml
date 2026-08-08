@@ -31,6 +31,12 @@
             <Label styleClass="section-label" text="PEERS ON NETWORK" />
 
             <ListView fx:id="peerListView" prefHeight="300.0" styleClass="peer-list" VBox.vgrow="ALWAYS" />
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-footer">
+            <children>
+               <Region HBox.hgrow="ALWAYS" />
+               <Button minWidth="-Infinity" onAction="#handleSettings" styleClass="btn-leave" text="Settings" />
+            </children>
+         </HBox>
 
         </VBox>
     </left>
@@ -53,7 +59,7 @@
                </Separator>
                <HBox maxHeight="-Infinity" styleClass="session-handle-container">
                   <children>
-                     <Label fx:id="sessionHandle" styleClass="session-handle" text="\@rage" />
+                     <Label fx:id="sessionHandle" styleClass="session-handle" text="\@home-pc" />
                   </children>
                </HBox>
                 </HBox>

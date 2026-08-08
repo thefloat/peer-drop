@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="520.0" spacing="20.0" styleClass="modal-pane" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.peerdrop.desktop.view.controller.SettingsController">
+    
+    <!-- Modal Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="modal-header">
+        <Label styleClass="modal-title" text="Settings" />
+      <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleClose" styleClass="btn-delete" text="✕" />
+    </HBox>
+
+    <!-- Content Sections -->
+    <VBox spacing="16.0" VBox.vgrow="ALWAYS">
+        
+        <!-- Section: Network Adapter Selection -->
+        <VBox spacing="8.0">
+            <Label styleClass="settings-section-title" text="NETWORK INTERFACE" />
+            
+            <VBox spacing="12.0" styleClass="settings-card">
+                <Label styleClass="detail-key" text="Select Active Adapter:" />
+                <ComboBox fx:id="interfaceComboBox" maxWidth="Infinity" styleClass="settings-combo-box" />
+            </VBox>
+        </VBox>
+
+        <!-- Section: Adapter Details -->
+        <VBox spacing="8.0">
+            <Label styleClass="settings-section-title" text="INTERFACE DETAILS" />
+            
+            <VBox spacing="12.0" styleClass="settings-card">
+                <GridPane hgap="16.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="35" />
+                        <ColumnConstraints percentWidth="65" />
+                    </columnConstraints>
+
+                    <!-- System Name -->
+                    <Label styleClass="detail-key" text="Interface ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label fx:id="lblSystemName" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <!-- MAC Address -->
+                    <Label styleClass="detail-key" text="Hardware MAC:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="lblMacAddress" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <!-- MTU -->
+                    <Label styleClass="detail-key" text="MTU Size:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label fx:id="lblMtu" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <!-- Status Flags -->
+                    <Label styleClass="detail-key" text="Flags / State:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <Label fx:id="lblStatusFlags" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <!-- IP Addresses -->
+                    <Label styleClass="detail-key" text="IP Address(es):" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+                    <Label fx:id="lblIpAddresses" styleClass="detail-value" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
+            </VBox>
+        </VBox>
+    </VBox>
+
+    <!-- Actions Footer -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0" styleClass="modal-footer">
+        <Button onAction="#handleClose" styleClass="btn-secondary" text="Cancel" />
+        <!-- Save Button is disabled automatically via ViewModel binding if no changes were made -->
+        <Button fx:id="btnSave" onAction="#handleSave" styleClass="btn-send" text="Apply &amp; Restart Service" />
+    </HBox>
+    
+</VBox>

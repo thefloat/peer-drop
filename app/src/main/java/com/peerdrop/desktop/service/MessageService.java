@@ -22,18 +22,20 @@ import java.util.function.Consumer;
 
 public class MessageService {
     private static final int SHUTDOWN_TIMEOUT_MS = 10000;
-    private final ServerSocket serverSocket;
-    private final ExecutorService peerConnPool;
     private final CopyOnWriteArrayList<Consumer<Message>> listeners =
             new CopyOnWriteArrayList<>();
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final AppContext appContext;
 
+    private ServerSocket serverSocket;
+    private ExecutorService peerConnPool;
     private volatile boolean isRunning = false;
 
-    private MessageService(AppContext appContext) throws IOException {
+    private MessageService(AppContext appContext) {
         this.appContext = appContext;
+    }
 
+    private void init() throws IOException {
         serverSocket = new ServerSocket(0);
         peerConnPool = Executors.newCachedThreadPool(r -> {
             var t = new Thread(r);
@@ -44,12 +46,7 @@ public class MessageService {
     }
 
     public static MessageService create(AppContext appContext) {
-        try {
-            return new MessageService(appContext);
-        } catch (IOException e) {
-            System.err.println("[Msg Service] I/O error while opening tcp socket.");
-        }
-        return null;
+        return new MessageService(appContext);
     }
 
     public static boolean send(
@@ -123,6 +120,12 @@ public class MessageService {
         if (isRunning) { return; }
 
         isRunning = true;
+
+        try {
+            init();
+        } catch (IOException e) {
+            throw new RuntimeException("[Msg Service] I/O error while initializing MessageService." + e);
+        }
 
         Thread acceptThread = new Thread(this::acceptLoop, "MsgService-Accept-Loop");
         acceptThread.setDaemon(true);

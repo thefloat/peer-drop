@@ -5,10 +5,16 @@ import java.util.*;
 
 public class NetworkInterfaceUtils {
 
+    private static final List<String> WIRELESS_KEYWORDS = List.of(
+            "wlan",              // Linux/Android conventions
+            "wi-fi", "wireless", // Windows conventions
+            "airport",           // Older macOS conventions
+            "en0");              // Modern macOS (frequently Wi-Fi on MacBooks)
+
     /*
-    Returns null if no viable network interfaces are found.
+    Returns an empty list if no viable network interfaces are found.
      */
-    public static NetworkInterface selectBestInterface() throws SocketException {
+    public static List<NetworkInterface> getViableInterfaces() throws SocketException {
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         List<NetworkInterface> viableInterfaces = new ArrayList<>();
 
@@ -26,29 +32,17 @@ public class NetworkInterfaceUtils {
             }
         }
 
-        if (viableInterfaces.isEmpty()) { return null; }
-
-        // 1. Attempt to find a wireless interface
-        for (NetworkInterface ni : viableInterfaces) {
-            if (isLikelyWireless(ni)) { return ni; }
-        }
-
-        // 2. Fallback to the first viable interface (often Ethernet)
-        NetworkInterface fallback = viableInterfaces.getFirst();
-        System.out.println(
-                "No wireless found. Using Fallback Interface: " +
-                        fallback.getDisplayName() + " (" +
-                        fallback.getName() + ")");
-        return fallback;
+        return viableInterfaces;
     }
 
-    private static boolean isLikelyWireless(NetworkInterface ni) {
+    public static boolean isLikelyWireless(NetworkInterface ni) {
         String name = ni.getName().toLowerCase();
         String display = ni.getDisplayName().toLowerCase();
 
-        return name.contains("wlan") || name.startsWith("wl") ||      // Linux/Android conventions
-                display.contains("wi-fi") || display.contains("wireless") || // Windows conventions
-                display.contains("airport") ||                         // Older macOS conventions
-                name.equals("en0");                                    // Modern macOS (frequently Wi-Fi on MacBooks)
+        boolean containsKeyword = WIRELESS_KEYWORDS.stream().anyMatch(
+                (k) -> name.contains(k) ||
+                        display.contains(k)
+        );
+        return name.startsWith("wl") || containsKeyword;
     }
 }

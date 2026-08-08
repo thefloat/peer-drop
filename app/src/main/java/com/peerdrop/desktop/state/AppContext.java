@@ -5,14 +5,17 @@ import com.peerdrop.desktop.service.DiscoveryService;
 import com.peerdrop.desktop.service.FileShareService;
 import com.peerdrop.desktop.service.MessageService;
 
+import java.net.NetworkInterface;
+
 public class AppContext {
     private MessageService messageService;
     private FileShareService fileShareService;
     private DiscoveryService discoveryService;
 
+    private PeerSession peerSession;
     private Integer messagePort;
     private Integer fileSharePort;
-    private PeerSession peerSession;
+    private NetworkInterface selectedNetworkInterface;
 
     public AppContext() {
         reset();
@@ -28,6 +31,14 @@ public class AppContext {
 
     public DiscoveryService getDiscoveryService() {
         return discoveryService;
+    }
+
+    public PeerSession getPeerSession() {
+        return peerSession;
+    }
+
+    public void setPeerSession(PeerSession peerSession) {
+        this.peerSession = peerSession;
     }
 
     public Integer getMessagePort() {
@@ -46,12 +57,12 @@ public class AppContext {
         this.fileSharePort = fileSharePort;
     }
 
-    public PeerSession getPeerSession() {
-        return peerSession;
+    public NetworkInterface getSelectedNetworkInterface() {
+        return selectedNetworkInterface;
     }
 
-    public void setPeerSession(PeerSession peerSession) {
-        this.peerSession = peerSession;
+    public void setSelectedNetworkInterface(NetworkInterface selectedNetworkInterface) {
+        this.selectedNetworkInterface = selectedNetworkInterface;
     }
 
     public void reset() {

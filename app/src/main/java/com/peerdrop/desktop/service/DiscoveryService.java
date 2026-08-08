@@ -20,46 +20,52 @@ public class DiscoveryService {
 
     private final CopyOnWriteArrayList<Consumer<List<Peer>>> listeners =
             new CopyOnWriteArrayList<>();
-    private final MulticastSocket multicastSocket;
-    private final PeerRegistry peerRegistry;
+    private MulticastSocket multicastSocket;
+    private PeerRegistry peerRegistry;
     private final AppContext appContext;
 
     private volatile boolean isRunning = false;
 
-    private DiscoveryService(AppContext appContext) throws IOException {
+    private DiscoveryService(AppContext appContext) {
         this.appContext = appContext;
+    }
 
+    private void init() throws IOException {
         peerRegistry = new PeerRegistry();
         multicastSocket = new MulticastSocket(DISCOVERY_PORT);
 
-        multicastSocket.setNetworkInterface(selectNetworkInterface());
+        var selected = appContext.getSelectedNetworkInterface();
+        var networkInterface = selected != null
+                ? selected
+                : selectNetworkInterface();
+        multicastSocket.setNetworkInterface(networkInterface);
         // multicastSocket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false); // Disable loop back
+
     }
 
     public static DiscoveryService create(AppContext appContext) {
-        try {
-            return new DiscoveryService(appContext);
-        } catch (IOException e) {
-            System.err.println("[Dsc Service] I/O error while initializing multicast sockets.");
-
-            e.printStackTrace();
-        }
-        return null;
+        return new DiscoveryService(appContext);
     }
 
     private NetworkInterface selectNetworkInterface() throws IOException {
-        NetworkInterface ni = NetworkInterfaceUtils.selectBestInterface();
-        if (ni != null) {
-            System.out.println(
-                    "[Dsc Service] Using Wireless Interface: " + ni.getDisplayName() + " (" + ni.getName() + ")");
-        } else {
+        List<NetworkInterface> viableInterfaces = NetworkInterfaceUtils.getViableInterfaces();
+
+        if (viableInterfaces.isEmpty()) {
             System.err.println(
-                    "[Dsc Service] No viable network interfaces found for multicast, deferring to localhost...");
-            ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-            System.err.println("[Dsc Service] Network Interface: " + ni.getDisplayName());
+                    "[Dsc Service] No viable network interfaces found for multicast, defaulting to localhost...");
+
+            return NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
         }
 
-        return ni;
+        var selectedInterface = viableInterfaces.stream().filter(NetworkInterfaceUtils::isLikelyWireless)
+                .findFirst()
+                .orElse(viableInterfaces.getFirst());
+
+        appContext.setSelectedNetworkInterface(selectedInterface);
+
+        System.out.println("[Dsc Service] Network Interface: " + selectedInterface.getDisplayName());
+
+        return selectedInterface;
     }
 
     private PeerSession getPeerSession() {
@@ -218,6 +224,12 @@ public class DiscoveryService {
             return;
         }
         isRunning = true;
+
+        try {
+            init();
+        } catch (IOException e) {
+            throw new RuntimeException("[Dsc Service] I/O error while initializing DiscoveryService.\n" + e);
+        }
 
         startThread(this::receiveLoop, "DscService-Receive-Loop");
         startThread(this::broadcastLoop, "DscService-Broadcast-Loop");

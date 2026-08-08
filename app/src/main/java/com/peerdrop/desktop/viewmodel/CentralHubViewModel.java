@@ -42,12 +42,12 @@ public class CentralHubViewModel {
     // Observable state
     // -------------------------------------------------------------------------
 
-    private final ObservableList<Peer>           peers              = FXCollections.observableArrayList();
-    private final ObservableMap<String, File>    hostedFiles        = FXCollections.observableHashMap();
-    private final ObservableList<File>           stagedFiles        = FXCollections.observableArrayList();
-    private final ObjectProperty<Peer>           selectedNode       = new SimpleObjectProperty<>();
-    private final StringProperty                 sessionHandle      = new SimpleStringProperty("");
-    private final StringProperty                 messageInput       = new SimpleStringProperty("");
+    private final ObservableList<Peer> peers = FXCollections.observableArrayList();
+    private final ObservableMap<String, File> hostedFiles = FXCollections.observableHashMap();
+    private final ObservableList<File> stagedFiles = FXCollections.observableArrayList();
+    private final ObjectProperty<Peer> selectedNode = new SimpleObjectProperty<>();
+    private final StringProperty sessionHandle = new SimpleStringProperty("");
+    private final StringProperty messageInput = new SimpleStringProperty("");
 
     // -------------------------------------------------------------------------
     // Internal state
@@ -201,8 +201,13 @@ public class CentralHubViewModel {
                 buildProgressListener(progressBar));
     }
 
+    public void openSettings() {
+        viewManager.openSettingsModal();
+    }
+
+
     /**
-     * Closes all services and navigates back to the welcome view.
+     * Resets AppContext and navigates back to the welcome view.
      */
     public void leave() {
         appContext.reset();
@@ -274,12 +279,12 @@ public class CentralHubViewModel {
     // Property accessors
     // -------------------------------------------------------------------------
 
-    public ObservableList<Peer>   getPeers()             { return peers;        }
-    public ObservableMap<String, File> getHostedFiles()  { return hostedFiles;  }
-    public ObservableList<File>   getStagedFiles()        { return stagedFiles;  }
-    public ObjectProperty<Peer>   selectedNodeProperty() { return selectedNode; }
-    public StringProperty         sessionHandleProperty() { return sessionHandle; }
-    public StringProperty         messageInputProperty() { return messageInput; }
+    public ObservableList<Peer> getPeers() { return peers;        }
+    public ObservableMap<String, File> getHostedFiles() { return hostedFiles;  }
+    public ObservableList<File> getStagedFiles() { return stagedFiles;  }
+    public ObjectProperty<Peer> selectedNodeProperty() { return selectedNode; }
+    public StringProperty sessionHandleProperty() { return sessionHandle; }
+    public StringProperty messageInputProperty() { return messageInput; }
 
     /**
      * Returns the message history for the currently selected peer, or

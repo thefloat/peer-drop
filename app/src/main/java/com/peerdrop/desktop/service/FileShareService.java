@@ -24,15 +24,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FileShareService {
-
-    private final HttpServer httpServer;
+    private final AppContext appContext;
     private final ConcurrentHashMap<String, File> hostedFiles = new ConcurrentHashMap<>();
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+    private HttpServer httpServer;
     private volatile boolean isRunning = false;
 
-    private FileShareService(AppContext appContext) throws IOException {
+    private FileShareService(AppContext appContext) {
+        this.appContext = appContext;
+    }
+
+    private void init() throws IOException {
         this.httpServer = HttpServer.create(new InetSocketAddress(0), 0);
         this.httpServer.createContext("/download", new FileSharingHandler());
         this.httpServer.setExecutor(Executors.newCachedThreadPool(r -> {
@@ -46,12 +50,7 @@ public class FileShareService {
     }
 
     public static FileShareService create(AppContext appContext) {
-        try {
-            return new FileShareService(appContext);
-        } catch (IOException e) {
-            System.err.println("[FileShare Service] I/O error while opening tcp socket.");
-        }
-        return null;
+        return new FileShareService(appContext);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -159,6 +158,12 @@ public class FileShareService {
         if (isRunning) { return; }
 
         isRunning = true;
+
+        try {
+            init();
+        } catch (IOException e) {
+            throw new RuntimeException("[FileShare Service] I/O error while initializing FileShareService.\n"+ e);
+        }
 
         this.httpServer.start();
     }

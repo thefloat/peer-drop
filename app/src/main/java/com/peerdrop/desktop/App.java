@@ -16,7 +16,7 @@ public class App extends Application {
         viewManager =
                 new ViewManager(
                         primaryStage, appContext);
-        viewManager.showGatewayView(); // Show initial scene
+        viewManager.showGatewayView();
     }
     
     @Override
