@@ -10,6 +10,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+<!--
+  ~ Copyright (c) 2026 Opolopo Eniyan
+  ~ Distributed under the MIT software license, see the accompanying
+  ~ file LICENSE or http://www.opensource.org/licenses/mit-license.php.
+  -->
+
 <VBox prefWidth="520.0" spacing="20.0" styleClass="modal-pane" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.peerdrop.desktop.view.controller.SettingsController">
     
     <!-- Modal Header -->

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 Opolopo Eniyan
+ * Distributed under the MIT software license, see the accompanying
+ * file LICENSE or http://www.opensource.org/licenses/mit-license.php.
+ */
+
 package com.peerdrop.desktop.view.controller;
 
 import com.peerdrop.desktop.model.Message;
@@ -5,7 +11,6 @@ import com.peerdrop.desktop.model.Peer;
 import com.peerdrop.desktop.service.FileShareService;
 import com.peerdrop.desktop.protocol.JsonCodec;
 import com.peerdrop.desktop.viewmodel.CentralHubViewModel;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
