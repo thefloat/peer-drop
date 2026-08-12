@@ -17,6 +17,10 @@ dependencies {
 //    implementation("org.apache.commons:commons-text")
 //    implementation(project(":utilities"))
     implementation("com.google.code.gson:gson:2.13.2")
+
+    implementation("org.testfx:testfx-core:4.0.18")
+    implementation("org.testfx:testfx-junit5:4.0.18")
+    implementation(platform("org.testfx:openjfx-monocle:21.0.2"))
 }
 
 application {

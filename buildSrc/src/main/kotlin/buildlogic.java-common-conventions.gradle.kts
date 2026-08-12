@@ -7,6 +7,9 @@ plugins {
     java
 }
 
+val mockitoCoreDependency = "org.mockito:mockito-core:5.23.0"
+val mockitoAgent = configurations.create("mockitoAgent")
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -20,8 +23,12 @@ dependencies {
 
     // Use JUnit Jupiter for testing.
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
-
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(mockitoCoreDependency)
+    testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
+    testImplementation("org.hamcrest:hamcrest:2.1")
+    
+    mockitoAgent(mockitoCoreDependency) { isTransitive = false }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -34,4 +41,9 @@ java {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    jvmArgs(
+        "-javaagent:${mockitoAgent.asPath}",
+        "--enable-native-access=ALL-UNNAMED",
+        "-Djava.net.preferIPv4Stack=true"
+    )
 }
