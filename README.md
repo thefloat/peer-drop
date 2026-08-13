@@ -101,8 +101,9 @@ You do not need Java installed to run the pre-packaged versions.
 ** Note: There's only releases for windows at this time, Linux and macOS users please [build from source] (#option-2-build-from-source).
 
 1. Navigate to the [Releases](https://github.com/thefloat/peer-drop/releases/latest) tab on this repository.
-2. **Windows:** Download the `.msi` or `.exe` installer.
-3. Install and run. (Ensure your firewall allows the application to communicate on private networks).
+2. **Windows:** Download the `PeerDrop.zip` file.
+3. Extract the ZIP file and run `PeerDrop.exe` (no installation required). 
+   *Ensure your firewall allows the application to communicate on private networks.*
 
 ### Option 2: Build from Source
 
