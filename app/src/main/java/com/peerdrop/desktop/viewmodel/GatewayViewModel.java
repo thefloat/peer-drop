@@ -44,40 +44,47 @@ public class GatewayViewModel {
     }
 
     /*
-     - One word.
-     - >= 2 characters.
+     * Rules:
+     *  - One word
+     *  - >= 2 characters
+     * Returns error message if string is invalide, null otherwise
     */
-    private boolean isValidUsername(String username) {
+    private String validatePeerHandle(String username) {
         if (username.length() < 2) {
-            statusLabel.set("username should have length >= 2");
-            return false;
+            return "handle should have length >= 2";
         }
-
-        return true;
+        return null;
     }
 
     public void join() {
-        String trimmed = username.get().trim();
-
-        if (trimmed.isEmpty()) {
-            statusLabel.set("Error: Username cannot be empty.");
-            return;
-        }
-
         isConnecting.set(true);
         statusLabel.set("Connecting...");
 
-        if (!isValidUsername(trimmed)) {
-            return;
+        try {
+            String trimmed = username.get().trim();
+
+            if (trimmed.isEmpty()) {
+                statusLabel.set("Error: Username cannot be empty.");
+                return;
+            }
+
+            String errorMsg = validatePeerHandle(trimmed);
+            if (errorMsg != null) {
+                statusLabel.set(errorMsg);
+                return;
+            }
+
+            setPeerSession(trimmed);
+
+            messageService.start();
+            fileShareService.start();
+            discoveryService.start();
+
+            viewManager.showCentralHubView();
+        } finally {
+            isConnecting.set(false);
         }
 
-        setPeerSession(trimmed);
-
-        messageService.start();
-        fileShareService.start();
-        discoveryService.start();
-
-        viewManager.showCentralHubView();
     }
 
     // getters

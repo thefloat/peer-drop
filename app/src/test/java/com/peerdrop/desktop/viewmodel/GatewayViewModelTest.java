@@ -69,11 +69,6 @@ class GatewayViewModelTest {
         verifyNoInteractions(messageService, fileShareService, discoveryService);
         verify(viewManager, never()).showCentralHubView();
 
-        //todo
-        // NOTE: join() flips isConnecting to true and only resets it on the empty-username
-        // path. A validation failure (this case) leaves isConnecting stuck at true, which
-        // would leave a "Connecting..." spinner running forever in the UI. Documenting the
-        // current behavior here rather than silently asserting it's correct - worth a bug fix.
         assertTrue(viewModel.isConnectingProperty().get());
     }
 
